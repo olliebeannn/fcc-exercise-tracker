@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 
 const mongoose = require('./mongoose');
 const {User} = require('./models/user');
+const {Exercise} = require('./models/exercise');
 
 const port = process.env.PORT || 3000;
 
@@ -54,6 +55,19 @@ app.post('/api/exercise/new-user', (req, res) => {
         res.status(400).send(err);
     });
 
+});
+
+app.get('/api/exercise/add', (req, res) => {
+    let exercise = new Exercise({
+        userId: '1',
+        description: 'running',
+        duration: 30,
+        date: new Date('2019-01-01')
+    });
+
+    exercise.save().then((newExercise) => {
+        res.send(newExercise);
+    });
 });
 
 app.listen(port, () => {
