@@ -31,6 +31,26 @@ app.get('/users', (req, res) => {
     });
 });
 
+app.post('/api/exercise/new-user', (req, res) => {
+
+    User.findOne({username: req.body.username}).then((user) => {
+        if (user) {
+            res.send(user);
+        } else {
+            let user = new User({
+                username: req.body.username
+            });
+
+            user.save().then((newUser) => {
+                res.send(newUser);
+            }, (err) => {
+                res.status(400).send(err);
+            });
+        }
+    });
+
+});
+
 app.listen(port, () => {
     console.log(`App up on port ${port}`)
 });
