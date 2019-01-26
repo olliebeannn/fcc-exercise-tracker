@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
+const _ = require('lodash');
 
 const mongoose = require('./mongoose');
 const {User} = require('./models/user');
@@ -74,7 +75,16 @@ app.get('/api/exercise/add', (req, res) => {
 });
 
 app.post('/api/exercise/add', (req, res) => {
-    let exercise = new Exercise(req.body);
+    let body = _.pick(req.body, ['userId', 'description', 'duration']);
+
+    // Check if there's date; if so, add to new document to send
+    if (req.body.date !== '') {
+        body.date = req.body.date;
+    } else {
+        body.date = undefined;
+    }
+
+    let exercise = new Exercise(body);
 
     // console.log(exercise);
 
