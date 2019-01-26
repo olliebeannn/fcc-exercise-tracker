@@ -32,10 +32,13 @@ app.get('/users', (req, res) => {
 });
 
 app.post('/api/exercise/new-user', (req, res) => {
+    if (req.body.username === '') {
+        return res.send('You must enter a username to create a new user.');
+    }
 
     User.findOne({username: req.body.username}).then((user) => {
         if (user) {
-            res.send(user);
+            return res.send(user);
         } else {
             let user = new User({
                 username: req.body.username
@@ -47,6 +50,8 @@ app.post('/api/exercise/new-user', (req, res) => {
                 res.status(400).send(err);
             });
         }
+    }).catch((err) => {
+        res.status(400).send(err);
     });
 
 });
