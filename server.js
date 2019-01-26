@@ -96,13 +96,39 @@ app.post('/api/exercise/add', (req, res) => {
 
     User.findOne({_id: new ObjectId(req.body.userId)}).then((user) => {
         if (!user) {
-            return res.send("No user with that username found");
+            return res.send("No user with that userId found");
         } else {
             exercise.save().then((newExercise) => {
                 return res.send(newExercise);
             }, (err) => {
                 return res.status(400).send(err);
             });
+        }
+    });
+});
+
+// Get exercise log
+app.get('/api/exercise/log', (req, res) => {
+    let userId = req.query.userId;
+
+    if (!ObjectId.isValid(userId)) {
+        return res.status(400).send("Enter a valid userId to get a log back");
+    }
+
+    User.findOne({_id: new ObjectId(userId)}).then((user) => {
+        if (!user) {
+            return res.send("No user with that userId found");
+        } else {
+            Exercise.find({userId: user._id.toHexString()}).then((exercises) => {
+                if (!exercises) {
+                    return res.send("This user has no exercises recorded.");
+                } else {
+                    return res.send(exercises);
+                }
+            }, (err) => {
+                res.send(err);
+            });
+            // return res.send(user);
         }
     });
 });
