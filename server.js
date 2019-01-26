@@ -111,6 +111,9 @@ app.post('/api/exercise/add', (req, res) => {
 app.get('/api/exercise/log', (req, res) => {
     let userId = req.query.userId;
 
+    console.log("from:", req.query.from);
+    console.log("to:", req.query.to);
+
     if (!ObjectId.isValid(userId)) {
         return res.status(400).send("Enter a valid userId to get a log back");
     }
@@ -119,7 +122,35 @@ app.get('/api/exercise/log', (req, res) => {
         if (!user) {
             return res.send("No user with that userId found");
         } else {
-            Exercise.find({userId: user._id.toHexString()}).then((exercises) => {
+            // if (req.query.from) console.log(req.query.from);
+
+            let query = {
+                userId: user._id.toHexString()
+            };
+
+            if (req.query.from) {
+                let fromDate = new Date(req.query.from);
+
+                query.date = {
+                    $gte: new Date(req.query.from)
+                }
+            }
+
+            if (req.query.to) {
+                query.date["$lte"] = new Date(req.query.to);
+            }
+
+            console.log(query);
+
+            // Old hardcoded query
+            // {
+            //     userId: user._id.toHexString(),
+            //     date: {
+            //         $gte: new Date('2019-01-18')
+            //     }
+            // }
+
+            Exercise.find(query).then((exercises) => {
                 if (!exercises) {
                     return res.send("This user has no exercises recorded.");
                 } else {
