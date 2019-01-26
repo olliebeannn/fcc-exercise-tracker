@@ -74,8 +74,14 @@ app.get('/api/exercise/add', (req, res) => {
     });
 });
 
+// Create new exercise if user id is valid
 app.post('/api/exercise/add', (req, res) => {
     let body = _.pick(req.body, ['userId', 'description', 'duration']);
+
+    // Check that objectId is valid; reject if not
+    if (!ObjectId.isValid(body.userId)) {
+        return res.status(400).send("ObjectId is invalid");
+    }
 
     // Check if there's date; if so, add to new document to send
     if (req.body.date !== '') {
