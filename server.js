@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const {ObjectId} = require('mongodb');
 
 const mongoose = require('./mongoose');
 const {User} = require('./models/user');
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/views/index.html');
 });
 
+// Test route
 app.get('/users', (req, res) => {
     let user = new User({
         username: "Ollie",
@@ -57,6 +59,7 @@ app.post('/api/exercise/new-user', (req, res) => {
 
 });
 
+// Test route
 app.get('/api/exercise/add', (req, res) => {
     let exercise = new Exercise({
         userId: '1',
@@ -67,6 +70,24 @@ app.get('/api/exercise/add', (req, res) => {
 
     exercise.save().then((newExercise) => {
         res.send(newExercise);
+    });
+});
+
+app.post('/api/exercise/add', (req, res) => {
+    let exercise = new Exercise(req.body);
+
+    // console.log(exercise);
+
+    User.findOne({_id: new ObjectId(req.body.userId)}).then((user) => {
+        if (!user) {
+            return res.send("No user with that username found");
+        } else {
+            exercise.save().then((newExercise) => {
+                return res.send(newExercise);
+            }, (err) => {
+                return res.status(400).send(err);
+            });
+        }
     });
 });
 
