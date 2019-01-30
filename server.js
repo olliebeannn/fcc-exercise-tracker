@@ -170,6 +170,20 @@ app.get('/api/exercise/log', (req, res) => {
                 if (!exercises) {
                     return res.send("This user has no exercises recorded.");
                 } else {
+                    if (req.query.limit) {
+                        let limit = Number(req.query.limit);
+                        console.log(typeof limit);
+
+                        if (Number.isInteger(limit)) {
+                            let results = exercises.slice(0, req.query.limit);
+                            return res.send(results);
+                        } else {
+                            return res.send({
+                                error: "You entered a limit that is not an integer. Enter an integer."
+                            });
+                        }
+                    }
+
                     return res.send(exercises);
                 }
             }, (err) => {
