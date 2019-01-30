@@ -128,16 +128,32 @@ app.get('/api/exercise/log', (req, res) => {
                 userId: user._id.toHexString()
             };
 
+            if (req.query.from || req.query.to) {
+                query.date = {};
+            }
+
             if (req.query.from) {
                 let fromDate = new Date(req.query.from);
 
-                query.date = {
-                    $gte: new Date(req.query.from)
+                if (fromDate.toUTCString() === 'Invalid Date') {
+                    return res.status(400).send({
+                        error: "The start date you entered is not valid. Enter a date in the format yyyy-mm-dd"
+                    });
+                } else {
+                    query.date["$gte"] = new Date(req.query.from);
                 }
             }
 
             if (req.query.to) {
-                query.date["$lte"] = new Date(req.query.to);
+                let toDate = new Date(req.query.to);
+
+                if (toDate.toUTCString() === 'Invalid Date') {
+                    return res.status(400).send({
+                        error: "The end date you entered is not valid. Enter a date in the format yyyy-mm-dd"
+                    });
+                } else {
+                    query.date["$lte"] = new Date(req.query.to);
+                }
             }
 
             console.log(query);
